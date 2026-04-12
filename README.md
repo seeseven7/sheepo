@@ -1,14 +1,17 @@
 # Bless My Sheepo Life
 
-           __  _
+```          __  _
        .-.'  `; `-._  __  _
       (_,)         .-:'  `; `-._
-    ,'o"(        (_,            )
-   (__,-'      ,'o"(             )>
-      (       (__,-'             )
+    ,'o"(        (_,           ))
+   (__,-'      ,'o"(            ))>
+      (       (__,-'            ))
        `-'._.--._(             )
           |||  |||`-'._.--._.-'
-                     |||  |||       Artist:  Bob Allison
+                     |||  |||      
+                     
+         Artist: Bob Allison
+```
 
 A chill sheep caretaking survival game about post-modern life. Protect Sheepo from wool overgrowth, evil flamethrower bees, the sun itself, and German nihilists who make your sheep stop caring about literally everything.
 
