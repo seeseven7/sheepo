@@ -20,12 +20,19 @@ class Bush:
 
         # Placeholder surface
         self.surface = pygame.Surface(s.BUSH_SIZE, pygame.SRCALPHA)
-        pygame.draw.ellipse(self.surface, s.DARK_GREEN, (0, 8, 64, 40))
-        pygame.draw.ellipse(self.surface, s.GREEN, (8, 0, 48, 36))
+        w, h = s.BUSH_SIZE
+        pygame.draw.ellipse(
+            self.surface, s.DARK_GREEN, (0, int(h * 0.15), w, int(h * 0.8))
+        )
+        pygame.draw.ellipse(
+            self.surface, s.GREEN, (int(w * 0.12), 0, int(w * 0.76), int(h * 0.72))
+        )
 
         # Wet overlay
         self.wet_surface = pygame.Surface(s.BUSH_SIZE, pygame.SRCALPHA)
-        pygame.draw.ellipse(self.wet_surface, (100, 150, 255, 80), (0, 8, 64, 40))
+        pygame.draw.ellipse(
+            self.wet_surface, (100, 150, 255, 80), (0, int(h * 0.15), w, int(h * 0.8))
+        )
 
     def splash(self) -> bool:
         """Splash water on this bush. Returns True if nihilist was flushed."""
@@ -170,7 +177,9 @@ class Nihilist:
             # Simple placeholder: dark figure
             pygame.draw.rect(surface, s.NIHILIST_COLOR, self.rect)
             # Beret
+            beret_w = int(self.rect.width * 0.75)
+            beret_h = max(10, int(self.rect.height * 0.22))
             pygame.draw.ellipse(
                 surface, s.BLACK,
-                (self.rect.x + 4, self.rect.y - 6, 24, 12)
+                (self.rect.x + 4, self.rect.y - 6, beret_w, beret_h)
             )

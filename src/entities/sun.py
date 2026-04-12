@@ -29,24 +29,46 @@ class Sun:
 
         # Placeholder surface
         self.surface = pygame.Surface(s.SUN_SIZE, pygame.SRCALPHA)
-        cx, cy = s.SUN_SIZE[0] // 2, s.SUN_SIZE[1] // 2
+        w, h = s.SUN_SIZE
+        cx, cy = w // 2, h // 2
+        sun_radius = int(min(w, h) * 0.38)
+        ray_inner = sun_radius
+        ray_outer = int(sun_radius * 1.25)
         # Sun body
-        pygame.draw.circle(self.surface, s.SUN_YELLOW, (cx, cy), 24)
+        pygame.draw.circle(self.surface, s.SUN_YELLOW, (cx, cy), sun_radius)
         # Rays
         for i in range(8):
             import math
             angle = i * (math.pi / 4)
-            x1 = cx + int(math.cos(angle) * 24)
-            y1 = cy + int(math.sin(angle) * 24)
-            x2 = cx + int(math.cos(angle) * 30)
-            y2 = cy + int(math.sin(angle) * 30)
-            pygame.draw.line(self.surface, s.SUN_YELLOW, (x1, y1), (x2, y2), 3)
+            x1 = cx + int(math.cos(angle) * ray_inner)
+            y1 = cy + int(math.sin(angle) * ray_inner)
+            x2 = cx + int(math.cos(angle) * ray_outer)
+            y2 = cy + int(math.sin(angle) * ray_outer)
+            pygame.draw.line(self.surface, s.SUN_YELLOW, (x1, y1), (x2, y2), max(2, w // 24))
         # Sunglasses
-        pygame.draw.rect(self.surface, s.BLACK, (cx - 14, cy - 6, 12, 8), border_radius=2)
-        pygame.draw.rect(self.surface, s.BLACK, (cx + 2, cy - 6, 12, 8), border_radius=2)
-        pygame.draw.line(self.surface, s.BLACK, (cx - 2, cy - 2), (cx + 2, cy - 2), 2)
+        lens_w = int(w * 0.2)
+        lens_h = int(h * 0.12)
+        lens_y = cy - lens_h // 2
+        left_lens_x = cx - lens_w - 2
+        right_lens_x = cx + 2
+        pygame.draw.rect(
+            self.surface, s.BLACK, (left_lens_x, lens_y, lens_w, lens_h), border_radius=2
+        )
+        pygame.draw.rect(
+            self.surface, s.BLACK, (right_lens_x, lens_y, lens_w, lens_h), border_radius=2
+        )
+        pygame.draw.line(
+            self.surface,
+            s.BLACK,
+            (left_lens_x + lens_w, lens_y + lens_h // 2),
+            (right_lens_x, lens_y + lens_h // 2),
+            2,
+        )
         # Smirk
-        pygame.draw.arc(self.surface, s.BLACK, (cx - 8, cy + 4, 16, 10), 3.14, 6.28, 2)
+        smirk_rect = pygame.Rect(
+            cx - int(w * 0.12), cy + int(h * 0.06), int(w * 0.24), int(h * 0.16)
+        )
+        pygame.draw.arc(self.surface, s.BLACK, smirk_rect, 3.14, 6.28, 2)
 
     def update(self, dt: float) -> bool:
         """Update sun state. Returns True if sun just triggered fire."""

@@ -33,7 +33,7 @@ BUCKET_BLUE = (80, 140, 220)
 CLIPPER_SILVER = (180, 180, 190)
 
 # ── Sheepo ──────────────────────────────────────────────
-SHEEPO_SIZE = (48, 48)
+SHEEPO_SIZE = (64, 64)
 SHEEPO_SPEED = 40             # Pixels per second
 SHEEPO_WANDER_PAUSE_MIN = 1.0 # Seconds
 SHEEPO_WANDER_PAUSE_MAX = 4.0
@@ -64,13 +64,13 @@ DGAF_BUBBLE_DURATION = 1.5     # How long "ya i dont even gaf bro" shows
 DGAF_TEXT = "ya i dont even gaf bro"
 
 # ── Bee ─────────────────────────────────────────────────
-BEE_SIZE = (24, 24)
+BEE_SIZE = (28, 28)
 BEE_SPEED = 180                # Pixels per second — fast!
 BEE_INITIAL_INTERVAL = 5.0    # Seconds between bee spawns
 BEE_MIN_INTERVAL = 1.5        # Fastest bee spawn rate
 
 # ── Sun ─────────────────────────────────────────────────
-SUN_SIZE = (64, 64)
+SUN_SIZE = (76, 76)
 SUN_APPROACH_SPEED = 15        # Pixels per second — very slow
 SUN_FIRE_THRESHOLD_X = SCREEN_WIDTH * 0.75  # X position that triggers fire
 SUN_FIRE_THRESHOLD_Y = SCREEN_HEIGHT * 0.05
@@ -81,13 +81,13 @@ SUN_RETURN_DECAY = 0.5        # Multiply return time by this each cycle
 SUN_MIN_RETURN = 1.0          # Minimum return time
 
 # ── Nihilist ────────────────────────────────────────────
-NIHILIST_SIZE = (32, 48)
+NIHILIST_SIZE = (40, 60)
 NIHILIST_SNEAK_SPEED = 300     # Very fast between bushes
 NIHILIST_BUSH_WAIT_MIN = 1.0   # Min seconds hiding in bush
 NIHILIST_BUSH_WAIT_MAX = 15.0  # Max seconds hiding in bush
 
 # ── Bushes ──────────────────────────────────────────────
-BUSH_SIZE = (64, 48)
+BUSH_SIZE = (76, 56)
 # Bush positions — 2 bushes on each side, between edge and center
 BUSH_POSITIONS_LEFT = [
     (80, SCREEN_HEIGHT * 0.45),
@@ -100,7 +100,7 @@ BUSH_POSITIONS_RIGHT = [
 ALL_BUSH_POSITIONS = BUSH_POSITIONS_LEFT + BUSH_POSITIONS_RIGHT
 
 # ── Pond ────────────────────────────────────────────────
-POND_SIZE = (80, 50)
+POND_SIZE = (96, 60)
 POND_POSITION = (SCREEN_WIDTH - 150, SCREEN_HEIGHT * 0.42)
 
 # ── Tools ───────────────────────────────────────────────
@@ -156,7 +156,7 @@ FONT_DIR = "assets/fonts/"
 USE_PLACEHOLDER_SPRITES = True  # Set False when real sprites are ready
 
 # Audio slots — set to None or filename
-MUSIC_TITLE = None       # e.g., "title_music.ogg"
+MUSIC_TITLE = "peg.mp3"
 MUSIC_INGAME = None      # e.g., "ingame_music.ogg"
 
 SFX_CLIP = None          # "clip.ogg"

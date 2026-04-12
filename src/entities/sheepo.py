@@ -1,6 +1,7 @@
 """Sheepo — the sheep you must protect at all costs"""
 
 import math
+import os
 import random
 
 import pygame
@@ -22,6 +23,7 @@ class Sheepo:
         self.target_x: float = self.x
         self.target_y: float = self.y
         self.moving: bool = False
+        self.facing_right: bool = False
         self.pause_timer: float = random.uniform(
             s.SHEEPO_WANDER_PAUSE_MIN, s.SHEEPO_WANDER_PAUSE_MAX
         )
@@ -41,8 +43,9 @@ class Sheepo:
         self.bubble_timer: float = 0.0
         self.bubble_text: str = ""
 
-        # Placeholder surface
+        # Placeholder surfaces and optional sprite overrides
         self._build_placeholder()
+        self._load_sprites()
 
     def _build_placeholder(self) -> None:
         """Create a simple colored placeholder sprite."""
@@ -79,6 +82,30 @@ class Sheepo:
         # Flat line eyes (bored)
         pygame.draw.line(self.dgaf_overlay, (200, 50, 50), (cx + 4, cy - 6), (cx + 12, cy - 6), 3)
         pygame.draw.line(self.dgaf_overlay, (200, 50, 50), (cx + 4, cy + 4), (cx + 12, cy + 4), 3)
+        self.dgaf_surface: pygame.Surface | None = None
+
+    def _load_sprite(self, filename: str) -> pygame.Surface | None:
+        """Load and scale one sprite file, or return None if unavailable."""
+        sprite_path = os.path.join(s.SPRITE_DIR, filename)
+        try:
+            loaded = pygame.image.load(sprite_path).convert_alpha()
+        except (FileNotFoundError, pygame.error):
+            return None
+        return pygame.transform.scale(loaded, s.SHEEPO_SIZE)
+
+    def _load_sprites(self) -> None:
+        """Load Sheepo sprites and keep placeholders for missing files."""
+        stage_files = {
+            s.WOOL_STAGE_NORMAL: "sheepo_normal.png",
+            s.WOOL_STAGE_WOOLY: "sheepo_wooly.png",
+            s.WOOL_STAGE_TOO_WOOLY: "sheepo_very_wooly.png",
+        }
+        for stage, filename in stage_files.items():
+            sprite = self._load_sprite(filename)
+            if sprite is not None:
+                self.base_surfaces[stage] = sprite
+
+        self.dgaf_surface = self._load_sprite("sheepo_dgaf.png")
 
     def set_on_fire(self) -> None:
         """Ignite Sheepo. Starts the fire countdown."""
@@ -146,6 +173,8 @@ class Sheepo:
         if self.moving:
             dx = self.target_x - self.x
             dy = self.target_y - self.y
+            if abs(dx) > 0.01:
+                self.facing_right = dx > 0
             dist = math.sqrt(dx * dx + dy * dy)
             if dist < 2:
                 self.moving = False
@@ -191,11 +220,15 @@ class Sheepo:
         """Draw Sheepo with current state."""
         # Base sprite for current wool stage
         stage = min(self.wool_stage, 2)
-        sprite = self.base_surfaces[stage].copy()
-
-        # DGAF overlay
-        if self.dgaf_stacks > 0:
-            sprite.blit(self.dgaf_overlay, (0, 0))
+        if self.dgaf_stacks > 0 and self.dgaf_surface is not None:
+            sprite = self.dgaf_surface.copy()
+        else:
+            sprite = self.base_surfaces[stage].copy()
+            # Fallback DGAF marker when dedicated sprite is missing
+            if self.dgaf_stacks > 0:
+                sprite.blit(self.dgaf_overlay, (0, 0))
+        if self.facing_right:
+            sprite = pygame.transform.flip(sprite, True, False)
 
         surface.blit(sprite, self.rect)
 

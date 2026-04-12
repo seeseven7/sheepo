@@ -33,15 +33,30 @@ class Bee:
 
         # Placeholder surface
         self.surface = pygame.Surface(s.BEE_SIZE, pygame.SRCALPHA)
+        w, h = s.BEE_SIZE
+        body_rect = pygame.Rect(
+            int(w * 0.08), int(h * 0.2), int(w * 0.84), int(h * 0.66)
+        )
         # Body
-        pygame.draw.ellipse(self.surface, s.BEE_YELLOW, (2, 4, 20, 16))
+        pygame.draw.ellipse(self.surface, s.BEE_YELLOW, body_rect)
         # Stripes
-        pygame.draw.line(self.surface, s.BEE_BLACK, (8, 4), (8, 20), 2)
-        pygame.draw.line(self.surface, s.BEE_BLACK, (14, 4), (14, 20), 2)
+        stripe_width = max(1, int(w * 0.08))
+        top = body_rect.top
+        bottom = body_rect.bottom
+        x1 = body_rect.left + int(body_rect.width * 0.35)
+        x2 = body_rect.left + int(body_rect.width * 0.65)
+        pygame.draw.line(self.surface, s.BEE_BLACK, (x1, top), (x1, bottom), stripe_width)
+        pygame.draw.line(self.surface, s.BEE_BLACK, (x2, top), (x2, bottom), stripe_width)
         # Eye
-        pygame.draw.circle(self.surface, (255, 0, 0), (19, 8), 3)  # Evil red eye
+        eye_radius = max(2, int(min(w, h) * 0.12))
+        eye_x = body_rect.right - eye_radius - 1
+        eye_y = body_rect.top + eye_radius + 1
+        pygame.draw.circle(self.surface, (255, 0, 0), (eye_x, eye_y), eye_radius)  # Evil red eye
         # Wings
-        pygame.draw.ellipse(self.surface, (200, 220, 255, 150), (4, 0, 10, 8))
+        wing_rect = pygame.Rect(
+            int(w * 0.16), 0, int(w * 0.42), int(h * 0.33)
+        )
+        pygame.draw.ellipse(self.surface, (200, 220, 255, 150), wing_rect)
 
     def update(self, dt: float, target_x: float, target_y: float) -> None:
         """Move toward the target (Sheepo) with wobble."""
