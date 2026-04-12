@@ -1,0 +1,33 @@
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Game data (generated at runtime)
+highscores.json
+
+# Cursor AI config and design docs — not for repo
+.cursorrules
+docs/
+
+# Distribution
+*.egg-info/
+dist/
+build/
