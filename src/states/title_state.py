@@ -1,4 +1,4 @@
-"""Title screen state with pixel-art background and bobbing title."""
+"""Title screen state with crisp background and bobbing title."""
 
 import math
 import os
@@ -17,6 +17,7 @@ class TitleState(BaseState):
         self.title_font: pygame.font.Font | None = None
         self.prompt_font: pygame.font.Font | None = None
         self.title_layers: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        self.title_sprite: pygame.Surface | None = None
         self.background_surface: pygame.Surface | None = None
         self.blink_timer: float = 0.0
         self.title_bob_timer: float = 0.0
@@ -34,6 +35,7 @@ class TitleState(BaseState):
         self.fade_surface = pygame.Surface((s.SCREEN_WIDTH, s.SCREEN_HEIGHT))
         self.fade_surface.fill(s.BLACK)
         self.background_surface = self._load_title_background()
+        self.title_sprite = self._load_title_sprite()
         self._build_title_layers()
 
         self._play_title_music()
@@ -59,17 +61,22 @@ class TitleState(BaseState):
         else:
             surface.fill(s.SKY_BLUE)
 
-        # Gentle left-right bob for retro handheld feel.
-        bob_x = int(math.sin(self.title_bob_timer * 2.2) * 12)
-        title_center = (s.SCREEN_WIDTH // 2 + bob_x, 105)
-        for title_layer, layer_offset in self.title_layers:
-            title_rect = title_layer.get_rect(
-                center=(
-                    title_center[0] + layer_offset[0],
-                    title_center[1] + layer_offset[1],
+        if self.title_sprite:
+            tilt_degrees = math.sin(self.title_bob_timer * 2.4) * 6.5
+            rotated = pygame.transform.rotate(self.title_sprite, tilt_degrees)
+            pixelated_title = self._pixelate_surface(rotated, 0.4)
+            title_rect = pixelated_title.get_rect(center=(s.SCREEN_WIDTH // 2, 105))
+            surface.blit(pixelated_title, title_rect)
+        else:
+            title_center = (s.SCREEN_WIDTH // 2, 105)
+            for title_layer, layer_offset in self.title_layers:
+                title_rect = title_layer.get_rect(
+                    center=(
+                        title_center[0] + layer_offset[0],
+                        title_center[1] + layer_offset[1],
+                    )
                 )
-            )
-            surface.blit(title_layer, title_rect)
+                surface.blit(title_layer, title_rect)
 
         # Blinking prompt
         if math.sin(self.blink_timer * 3) > 0:
@@ -99,16 +106,66 @@ class TitleState(BaseState):
             return
 
     def _load_title_background(self) -> pygame.Surface | None:
-        """Load and pixelate the title background image."""
+        """Load title background and fit to screen without forced pixelation."""
         image_path = os.path.join(s.SPRITE_DIR, "titlescreen.png")
         try:
             loaded = pygame.image.load(image_path).convert()
         except (FileNotFoundError, pygame.error):
             return None
 
-        # Pixelation pass: downscale, then upscale with nearest-neighbor.
-        low_res = pygame.transform.scale(loaded, (100, 100))
-        return pygame.transform.scale(low_res, (s.SCREEN_WIDTH, s.SCREEN_HEIGHT))
+        image_width, image_height = loaded.get_size()
+        screen_size = (s.SCREEN_WIDTH, s.SCREEN_HEIGHT)
+        if (image_width, image_height) == screen_size:
+            return loaded
+
+        # Cover/fill the screen with nearest-neighbor scaling, then center-crop.
+        scale_factor = max(
+            s.SCREEN_WIDTH / image_width,
+            s.SCREEN_HEIGHT / image_height,
+        )
+        scaled_size = (
+            max(1, int(round(image_width * scale_factor))),
+            max(1, int(round(image_height * scale_factor))),
+        )
+        scaled = pygame.transform.scale(loaded, scaled_size)
+
+        crop_x = max(0, (scaled_size[0] - s.SCREEN_WIDTH) // 2)
+        crop_y = max(0, (scaled_size[1] - s.SCREEN_HEIGHT) // 2)
+        crop_rect = pygame.Rect(crop_x, crop_y, s.SCREEN_WIDTH, s.SCREEN_HEIGHT)
+        return scaled.subsurface(crop_rect).copy()
+
+    def _load_title_sprite(self) -> pygame.Surface | None:
+        """Load the custom title sprite if present."""
+        image_path = os.path.join(s.SPRITE_DIR, "title.png")
+        try:
+            loaded = pygame.image.load(image_path).convert_alpha()
+        except (FileNotFoundError, pygame.error):
+            return None
+
+        max_width = int(s.SCREEN_WIDTH * 0.86)
+        max_height = int(s.SCREEN_HEIGHT * 0.32)
+        width, height = loaded.get_size()
+        if width <= max_width and height <= max_height:
+            return loaded
+
+        scale_factor = min(max_width / width, max_height / height)
+        resized_size = (
+            max(1, int(round(width * scale_factor))),
+            max(1, int(round(height * scale_factor))),
+        )
+        return pygame.transform.scale(loaded, resized_size)
+
+    def _pixelate_surface(
+        self, source: pygame.Surface, scale_factor: float
+    ) -> pygame.Surface:
+        """Downscale and upscale a surface for crunchy retro pixels."""
+        width, height = source.get_size()
+        low_res_size = (
+            max(1, int(round(width * scale_factor))),
+            max(1, int(round(height * scale_factor))),
+        )
+        low_res = pygame.transform.scale(source, low_res_size)
+        return pygame.transform.scale(low_res, (width, height))
 
     def _build_title_layers(self) -> None:
         """Create layered title text for a faux 3D pixel look."""
